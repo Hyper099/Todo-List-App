@@ -56,14 +56,12 @@ function editTodo(index) {
       </div>
    `;
 
-   // Add Cancel Button Event Listener
    const cancelButton = todoElement.querySelector('.cancel-edit-button');
    cancelButton.addEventListener('click', () => {
       todoElement.innerHTML = todoElementCopy;
-      attachEventListeners();
+      attachEventListenersForItem(todoElement, index);
    });
 
-   // Add Save Button Event Listener
    const saveButton = todoElement.querySelector('.save-edit-button');
    saveButton.addEventListener('click', () => {
       const newName = todoElement.querySelector('.new-name-input').value.trim();
@@ -72,8 +70,22 @@ function editTodo(index) {
       if (newName && newDueDate) {
          todoItem.todoName = newName;
          todoItem.todoDueDate = newDueDate;
+         todoItem.completed = false;
          saveTodoListToLocalStorage();
-         renderTodoHTML();
+
+         todoElement.innerHTML = `
+            <input type="checkbox" class="checkbox" data-index="${index}" ${todoItem.completed ? 'checked' : ''}>
+            
+            <div class="todo-name ${todoItem.completed ? 'cross' : ''}">${todoItem.todoName}</div>
+            
+            <div class="due-date-and-button-container">
+               <div class="todo-due-date">${todoItem.todoDueDate}</div>
+                  <button class="edit-todo-button" data-index="${index}">Edit</button>
+                  <button class="delete-todo-button" data-index="${index}">Delete</button>
+            </div>
+         `;
+         attachEventListenersForItem(todoElement, index);
+
       } else {
          alert("Please fill out both fields before saving the changes.");
       }
@@ -107,32 +119,29 @@ function renderTodoHTML() {
 }
 
 function attachEventListeners() {
-   //! checkbox handler.
-   document.querySelectorAll('.checkbox').forEach(checkbox => {
-      checkbox.addEventListener('change', (event) => {
-         const index = event.target.getAttribute('data-index');
-         todoList[index].completed = event.target.checked;
-         saveTodoListToLocalStorage();
-         renderTodoHTML();
-      });
+   const todoItems = document.querySelectorAll('.todo-item');
+   todoItems.forEach((todoElement, index) => {
+      attachEventListenersForItem(todoElement, index);
+   });
+}
+
+
+
+function attachEventListenersForItem(todoElement, index) {
+
+   const checkbox = todoElement.querySelector('.checkbox');
+   checkbox.addEventListener('change', () => {
+      todoList[index].completed = checkbox.checked;
+      saveTodoListToLocalStorage();
+      const todoName = todoElement.querySelector('.todo-name');
+      todoName.classList.toggle('cross', checkbox.checked);
    });
 
+   const editButton = todoElement.querySelector('.edit-todo-button');
+   editButton.addEventListener('click', () => { editTodo(index); });
 
-   //! edit button handler
-   document.querySelectorAll('.edit-todo-button').forEach(editButton => {
-      editButton.addEventListener('click', (event) => {
-         const index = event.target.getAttribute('data-index');
-         editTodo(index);
-      });
-   });
+   const deleteButton = todoElement.querySelector('.delete-todo-button');
+   deleteButton.addEventListener('click', () => { deleteTodo(index); });
+}
 
-
-   //! delete button handler
-   document.querySelectorAll('.delete-todo-button').forEach(deleteButton => {
-      deleteButton.addEventListener('click', (event) => {
-         const index = event.target.getAttribute('data-index');
-         deleteTodo(index);
-      });
-   });
-};
 
