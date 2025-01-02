@@ -39,15 +39,15 @@ function deleteTodo(index) {
 
 function editTodo(index) {
    const todoItem = todoList[index];
-   const todoELement = document.querySelectorAll('.todo-item')[index];
-   const todoELementCopy = todoELement.innerHTML; //
+   const todoElement = document.querySelectorAll('.todo-item')[index];
+   const todoElementCopy = todoElement.innerHTML;
 
-   const newNameInput = `<input type="text" value=${todoItem.todoName} class="new-name-input"> `;
-   const newDateInput = `<input type="date" value=${todoItem.todoDueDate} class="new-duedate-input"> `;
-   const newSaveButton = `<button class="save-edit-button" data-index="${index}">Save</button>`;
-   const newCancelButton = `<button class="cancel-edit-button" data-index="${index}">Cancel</button>`;
+   const newNameInput = `<input type="text" value="${todoItem.todoName}" class="new-name-input">`;
+   const newDateInput = `<input type="date" value="${todoItem.todoDueDate}" class="new-duedate-input">`;
+   const newSaveButton = `<button class="save-edit-button">Save</button>`;
+   const newCancelButton = `<button class="cancel-edit-button">Cancel</button>`;
 
-   todoELement.innerHTML = `
+   todoElement.innerHTML = `
       ${newNameInput}
       ${newDateInput}
       <div class="new-edit-button-container">
@@ -56,28 +56,30 @@ function editTodo(index) {
       </div>
    `;
 
-   document.querySelectorAll('.cancel-edit-button')[index].addEventListener('click', () => {
-      todoELement.innerHTML = todoELementCopy;
-
+   // Add Cancel Button Event Listener
+   const cancelButton = todoElement.querySelector('.cancel-edit-button');
+   cancelButton.addEventListener('click', () => {
+      todoElement.innerHTML = todoElementCopy;
       attachEventListeners();
    });
 
-   document.querySelectorAll('.save-edit-button')[index].addEventListener('click', () => {
-      const newName = document.querySelector('.new-name-input').value.trim();
-      const newDueDate = document.querySelector('.new-duedate-input').value.trim();
+   // Add Save Button Event Listener
+   const saveButton = todoElement.querySelector('.save-edit-button');
+   saveButton.addEventListener('click', () => {
+      const newName = todoElement.querySelector('.new-name-input').value.trim();
+      const newDueDate = todoElement.querySelector('.new-duedate-input').value.trim();
 
       if (newName && newDueDate) {
          todoItem.todoName = newName;
          todoItem.todoDueDate = newDueDate;
          saveTodoListToLocalStorage();
          renderTodoHTML();
-      }
-      else {
+      } else {
          alert("Please fill out both fields before saving the changes.");
       }
-   })
-
+   });
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
